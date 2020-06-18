@@ -1,18 +1,29 @@
 import bs4, requests
+import sys
 
-product = 'https://www.bol.com/nl/p/the-last-of-us-part-ii-ps4/9200000072535107/?bltgh=m5Qn41dBogHUr81F2xFKNw.1_4.5.ProductTitle'
+if len(sys.argv) < 2:
+    print('Give name of game as argument')
+    sys.exit(0)
 
 
-def getBolPrice(productUrl):
-    res = requests.get(productUrl)
+search_term = sys.argv[1]
+
+def getBolPrices(product):
+    product_url = f'https://www.bol.com/nl/s/?searchtext={product}&searchContext=media_all&appliedSearchContextId=&suggestFragment={product}&adjustedSection=&originalSection=main&originalSearchContext=media_all&section=main&N=0&defaultSearchContext=media_all'
+    res = requests.get(product_url)
     res.raise_for_status()
 
     soup = bs4.BeautifulSoup(res.text, 'html.parser')
-    elems = soup.select('.promo-price')
+    elems = soup.select('.product-item--row')
     # TODO Fix display
-    return elems[0].text.strip()
+    prices = []
+    for elem in elems:
+        name = elem.select('.product-title')[0].text.strip()
+        price = elem.select('.price-block')[0].select('meta')[0].attrs['content'].strip()
+        prices.append(f'{name}: {price}')
+    return prices
 
 
-price = getBolPrice(product)
+prices = getBolPrices(search_term)
 
-print('The price is ' + price)
+print('The price is ' + '\n'.join(prices))
