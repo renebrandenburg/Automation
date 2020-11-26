@@ -1,3 +1,7 @@
-import webbrowser 
+import webbrowser
+import os
 
-webbrowser.open('https://www.praegus.nl')
+url = 'https://www.praegus.nl' 
+
+
+webbrowser.open(url, new=2)
